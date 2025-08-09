@@ -30,7 +30,8 @@ public with sharing class TriggerBestPracticeTest {
     /*
     * Update the AccountTrigger.trigger to use the AccountHelper class
     * You can use the AccountTrigger provided or the previous one you created in the last assignment
-    * If you are using the last assignments AccountTrigger you created. Copy and paste the code from the previous modules's project into this project and deploy it to your org
+    * If you are using the last assignments AccountTrigger you created. Copy and paste the code from 
+    * the previous modules's project into this project and deploy it to your org
     * Implement the AccountHelper class methods for each of the distinct trigger logic from the AccountTrigger
     * All of the AccountTrigger tests should pass if you have implemented the AccountHelper class correctly
     */
