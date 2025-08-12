@@ -23,11 +23,7 @@ trigger AccountTrigger on Account (before insert, after insert) {
     if (Trigger.isInsert) {
         if (Trigger.isBefore) {
             AccountHelper.setTypeProspect(Trigger.new);
-        }
-        if (Trigger.isBefore) {
             AccountHelper.addressCopy(Trigger.new);
-        }
-        if (Trigger.isBefore) {
             AccountHelper.setRating(Trigger.new);
         }
         if (Trigger.isAfter) {

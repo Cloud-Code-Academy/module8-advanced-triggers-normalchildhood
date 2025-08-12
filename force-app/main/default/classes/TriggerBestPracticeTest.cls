@@ -16,7 +16,8 @@ In this assignment, you will be refactoring and consolidating multiple files to 
    OpportunityTriggerHandler class by implementing the TriggerHandler framework provided. 
    This handler will be responsible for all Opportunity-related trigger events. By consolidating the 
    logic into one handler, you ensure more maintainable and organized code.
-   The OpportunityTriggerHandler class was not provided. You will need to create this class from scratch and extend the TriggerHandler class.
+   The OpportunityTriggerHandler class was not provided. You will need to create this class from scratch and extend 
+   the TriggerHandler class.
    Some of the logic for AnotherOpportunityTrigger and OpportunityTrigger may conflict. 
    Ensure that the logic is combined into one method and that the method is called from the appropriate trigger event.
 
