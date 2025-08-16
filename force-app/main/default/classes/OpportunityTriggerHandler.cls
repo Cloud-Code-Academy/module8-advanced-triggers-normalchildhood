@@ -1,4 +1,6 @@
 public with sharing class OpportunityTriggerHandler {
+    public static boolean skipUpdateHandlers = false;
+    
     public static void setTypeProspect(List<Account> accounts) {
         for (Account acc : accounts) {
             if (acc.Type == null) {
@@ -16,13 +18,41 @@ public with sharing class OpportunityTriggerHandler {
         
     }
     
-    public static void noDeleteClosedOpps (List<Opportunity> opps) {
-        for (Opportunity oldOpp : opps){
-            if (oldOpp.IsClosed){
-                oldOpp.addError('Cannot delete closed opportunity');
-            }
+    public static void noDeleteClosedOpps(List<Opportunity> opps) {
+    if (opps == null || opps.isEmpty()) {
+        return;
+    }
+
+    // Collect IDs safely
+    Set<Id> oppIds = new Set<Id>();
+    for (Opportunity opp : opps) {
+        if (opp != null && opp.Id != null) {
+            oppIds.add(opp.Id);
         }
     }
+
+    if (oppIds.isEmpty()) {
+        return;
+    }
+
+    // Query IsClosed explicitly
+    Map<Id, Opportunity> oppMap = new Map<Id, Opportunity>(
+        [SELECT Id, IsClosed FROM Opportunity WHERE Id IN :oppIds]
+    );
+
+    // Now check and add errors
+    for (Opportunity oldOpp : opps) {
+        Opportunity queried = oppMap.get(oldOpp.Id);
+        if (queried != null && Boolean.valueOf(queried.IsClosed)) {
+            oldOpp.addError('Cannot delete closed opportunity');
+        }
+    }
+}
+
+    
+    
+    
+    
     
     public static void oppCEOContact(List<Opportunity> opps){
         Set<Id> accountIds = new Set<Id>();
@@ -56,6 +86,7 @@ public with sharing class OpportunityTriggerHandler {
     }
     
     public static void newOppTask(List<Opportunity> opps) {
+        List<Task> tasksToInsert = new List<Task>();
         for (Opportunity opp : opps){
             Task tsk = new Task();
             tsk.Subject = 'Call Primary Contact';
@@ -63,9 +94,13 @@ public with sharing class OpportunityTriggerHandler {
             tsk.WhoId = opp.Primary_Contact__c;
             tsk.OwnerId = opp.OwnerId;
             tsk.ActivityDate = Date.today().addDays(3);
-            insert tsk;
+            tasksToInsert.add(tsk);
+        }
+        if (!tasksToInsert.isEmpty()){
+            insert tasksToInsert;
         }
     }
+    
     
     public static void stageChangesInDesc (List<Opportunity> opps) {
         for (Opportunity opp : opps){
@@ -110,40 +145,63 @@ public with sharing class OpportunityTriggerHandler {
         }
     }
     
-    public static void assignPrimaryContact(Map<Id,Opportunity> oppNewMap) {
+    public static void assignPrimaryContact(List<Opportunity> oppList) {
+        
+        Map<Id, Opportunity> oppNewMap = new Map<Id, Opportunity>(oppList);
+        
         Set<Id> accountIds = new Set<Id>();
-        for (Opportunity opp : oppNewMap.values()){
+        for (Opportunity opp : oppNewMap.values()) {
             if (opp.AccountId != null) {
                 accountIds.add(opp.AccountId);
             }
         }
+        
+        if (accountIds.isEmpty()) {
+            return;
+        }
+        
         Map<Id, Contact> accountToContactMap = new Map<Id, Contact>();
-        for (Contact cont : [SELECT Id, AccountId
-                            FROM Contact
-                            WHERE Title = 'VP Sales'
-                            AND AccountId IN :accountIds
-                            ORDER BY CreatedDate ASC])
-        {
+        for (Contact cont : [
+        SELECT Id, AccountId
+        FROM Contact
+        WHERE Title = 'VP Sales'
+        AND AccountId IN :accountIds
+        ORDER BY CreatedDate ASC, Id ASC
+    ]) {
             if (!accountToContactMap.containsKey(cont.AccountId)) {
                 accountToContactMap.put(cont.AccountId, cont);
             }
         }
         
+        if (accountToContactMap.isEmpty()) {
+            return;
+        }
+        
         List<Opportunity> oppsToUpdate = new List<Opportunity>();
+        
         for (Opportunity opp : oppNewMap.values()) {
-            if (opp.Primary_Contact__c == null &&
-            accountToContactMap.containsKey(opp.AccountId)) {
-                oppsToUpdate.add(
-                    new Opportunity(
+            Boolean hasMatchingContact = accountToContactMap.containsKey(opp.AccountId);
+            if (!hasMatchingContact) continue;
+            
+            if (Trigger.isUndelete) {
+                oppsToUpdate.add(new Opportunity(
                     Id = opp.Id,
                 Primary_Contact__c = accountToContactMap.get(opp.AccountId).Id
-                    )
-                    );
+                    ));
+            } else {
+                if (opp.Primary_Contact__c == null) {
+                    oppsToUpdate.add(new Opportunity(
+                        Id = opp.Id,
+                    Primary_Contact__c = accountToContactMap.get(opp.AccountId).Id
+                        ));
+                }
             }
         }
         
         if (!oppsToUpdate.isEmpty()) {
+            skipUpdateHandlers = true;
             update oppsToUpdate;
+            skipUpdateHandlers = false;
         }
     }
 }

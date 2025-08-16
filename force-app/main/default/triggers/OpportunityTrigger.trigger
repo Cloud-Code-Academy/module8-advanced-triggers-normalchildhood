@@ -18,7 +18,7 @@ Remember, whichever option you choose, ensure that the trigger is activated and 
 trigger OpportunityTrigger on Opportunity (before insert, after insert, before update, after update,
 before delete, after delete, after undelete) {
     
-
+    
     if (Trigger.isInsert) {
         if (Trigger.isBefore) {
             OpportunityTriggerHandler.newOppDefaultType(Trigger.new);
@@ -32,21 +32,22 @@ before delete, after delete, after undelete) {
             OpportunityTriggerHandler.validateAmountGreaterThan5000(Trigger.new);
             OpportunityTriggerHandler.oppCEOContact(Trigger.new);
         }
-        if (Trigger.isAfter) {
+        if (Trigger.isAfter && !OpportunityTriggerHandler.skipUpdateHandlers) {
             OpportunityTriggerHandler.stageChangesInDesc(Trigger.new);
+            OpportunityTriggerHandler.newOppTask(Trigger.new);
         }
     }
     if (Trigger.isDelete) {
         if (Trigger.isBefore) {
-            OpportunityTriggerHandler.noDeleteClosedOpps(Trigger.new);
+            OpportunityTriggerHandler.noDeleteClosedOpps(Trigger.old);
         }
         if (Trigger.isAfter) {
-            OpportunityTriggerHandler.notifyOwnersOpportunityDeleted(Trigger.new);
+            OpportunityTriggerHandler.notifyOwnersOpportunityDeleted(Trigger.old);
         }
     }
     if (Trigger.isUndelete) {
         if (Trigger.isAfter) {
-            OpportunityTriggerHandler.assignPrimaryContact(Trigger.newMap);
+            OpportunityTriggerHandler.assignPrimaryContact(Trigger.new);
         }
     }
 }
