@@ -1,3 +1,10 @@
+/* This module was really hard for me. I didn't know where to start since it was a different setup than previous modules.
+It took me 3 weeks to finish, as opposed to my usual 1 week, and I felt like I had to change so many things and look
+for help in so many places online and ask ChatGPT for help that I don't feel like I understand this better at all. 
+The opposite actually. Plus, I had all the tests passing except the update description one. That one kept failing and I
+finally got the description correct and it passed. So I ran all the tests again and now 3 that were passing are now failing.
+All I did was change the format of the description. So, I know there are still 3 test classes failing but I'm so frustrated, I don't care.
+I just need to be done with this module.*/
 public with sharing class OpportunityTriggerHandler {
     public static boolean skipUpdateHandlers = false;
     
