@@ -16,7 +16,8 @@ In this assignment, you will be refactoring and consolidating multiple files to 
    OpportunityTriggerHandler class by implementing the TriggerHandler framework provided. 
    This handler will be responsible for all Opportunity-related trigger events. By consolidating the 
    logic into one handler, you ensure more maintainable and organized code.
-   The OpportunityTriggerHandler class was not provided. You will need to create this class from scratch and extend the TriggerHandler class.
+   The OpportunityTriggerHandler class was not provided. You will need to create this class from scratch and extend 
+   the TriggerHandler class.
    Some of the logic for AnotherOpportunityTrigger and OpportunityTrigger may conflict. 
    Ensure that the logic is combined into one method and that the method is called from the appropriate trigger event.
 
@@ -30,7 +31,8 @@ public with sharing class TriggerBestPracticeTest {
     /*
     * Update the AccountTrigger.trigger to use the AccountHelper class
     * You can use the AccountTrigger provided or the previous one you created in the last assignment
-    * If you are using the last assignments AccountTrigger you created. Copy and paste the code from the previous modules's project into this project and deploy it to your org
+    * If you are using the last assignments AccountTrigger you created. Copy and paste the code from 
+    * the previous modules's project into this project and deploy it to your org
     * Implement the AccountHelper class methods for each of the distinct trigger logic from the AccountTrigger
     * All of the AccountTrigger tests should pass if you have implemented the AccountHelper class correctly
     */
