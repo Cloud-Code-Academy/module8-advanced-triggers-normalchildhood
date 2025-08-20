@@ -27,16 +27,18 @@ before delete, after delete, after undelete) {
             OpportunityTriggerHandler.newOppTask(Trigger.new);
         }
     }
+    
     if (Trigger.isUpdate) {
-        if (Trigger.isBefore) {
-            OpportunityTriggerHandler.validateAmountGreaterThan5000(Trigger.new);
-            OpportunityTriggerHandler.oppCEOContact(Trigger.new);
-        }
-        if (Trigger.isAfter && !OpportunityTriggerHandler.skipUpdateHandlers) {
-            OpportunityTriggerHandler.stageChangesInDesc(Trigger.new);
-            OpportunityTriggerHandler.newOppTask(Trigger.new);
-        }
+    if (Trigger.isBefore) {
+        OpportunityTriggerHandler.validateAmountGreaterThan5000(Trigger.new);
+        OpportunityTriggerHandler.oppCEOContact(Trigger.new);
+        OpportunityTriggerHandler.stageChangesInDesc(Trigger.new, Trigger.oldMap);
+    if (Trigger.isAfter && !OpportunityTriggerHandler.skipUpdateHandlers) {
+        OpportunityTriggerHandler.newOppTask(Trigger.new);
     }
+}
+
+    
     if (Trigger.isDelete) {
         if (Trigger.isBefore) {
             OpportunityTriggerHandler.noDeleteClosedOpps(Trigger.old);
@@ -50,4 +52,5 @@ before delete, after delete, after undelete) {
             OpportunityTriggerHandler.assignPrimaryContact(Trigger.new);
         }
     }
+}
 }

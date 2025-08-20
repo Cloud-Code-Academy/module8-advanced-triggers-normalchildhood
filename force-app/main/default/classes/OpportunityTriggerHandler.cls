@@ -102,14 +102,16 @@ public with sharing class OpportunityTriggerHandler {
     }
     
     
-    public static void stageChangesInDesc (List<Opportunity> opps) {
-        for (Opportunity opp : opps){
-            if (opp.StageName != null){
-                opp.Description += '\n Stage Change:' + opp.StageName + ':' + DateTime.now().format();
-            }
+   public static void stageChangesInDesc(List<Opportunity> newList, Map<Id, Opportunity> oldMap) {
+    for (Opportunity opp : newList) {
+        Opportunity oldOpp = oldMap.get(opp.Id);
+        if (oldOpp != null && oldOpp.StageName != opp.StageName) {
+            opp.Description = 'Stage Change:' + opp.StageName;
         }
-        update Trigger.new;
     }
+}
+
+
     
     public static void notifyOwnersOpportunityDeleted(List<Opportunity> opps) {
         
